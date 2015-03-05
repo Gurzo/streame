@@ -22,6 +22,16 @@ Documentation
 
 Full documentation is available at:
  http://latanadelgurzo.blogspot.com/2015/03/listen-youtube-music-on-your-android.html
+ 
+Requirements
+------------
+
+- QPython https://play.google.com/store/apps/details?id=com.hipipal.qpyplus
+- VLC for android https://play.google.com/store/apps/details?id=org.videolan.vlc
+- pafy for python https://github.com/np1/pafy
+  you can install pafy dicrectly from pip 
+.. image:: http://3.bp.blogspot.com/-zdGtEgozh2A/VPjdc9L1EfI/AAAAAAAABY8/bWO7Qbpm1bI/s1600/istr.png
+    :target: http://3.bp.blogspot.com/-zdGtEgozh2A/VPjdc9L1EfI/AAAAAAAABY8/bWO7Qbpm1bI/s1600/istr.png
 
 Download
 --------
