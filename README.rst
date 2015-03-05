@@ -35,4 +35,4 @@ Usage Examples
 --------------
 
 Here is how to use the script on your device:
- https://www.youtube.com/watch?v=C06QHoWxUbo&feature=youtu.be
+ https://www.youtube.com/watch?v=AKTst0m2bEY
