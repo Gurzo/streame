@@ -4,7 +4,7 @@
 """
 This is the beta version of streaMe
 
-version: 0.1
+version: 0.1.1
 
 @Author: Gurzo
 @Date: 2015-03-05
@@ -69,11 +69,15 @@ def searchYT(word, page):
 	return (titles, urls)
 	
 def search(by = '', page = 1):	
+	global droid
 	word = ''
 	if page == 1:
 		line = droid.dialogGetInput(title='YouTube', message='Search for')
 		if line.result == None or line.result == 'negative':
 			return
+		elif line.result == '':
+			droid.makeToast('You must insert something!')
+			return search()
 		word = line.result
 	else:
 		word = by
