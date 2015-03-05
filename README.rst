@@ -1,4 +1,5 @@
-#StreaMe
+StreaMe
+-------
 
 Listen YouTube music on your Android device with QPython and VLC
 
@@ -19,7 +20,8 @@ Features
 Documentation
 -------------
 
-Full documentation is available at http://latanadelgurzo.blogspot.com/2015/03/listen-youtube-music-on-your-android.html
+Full documentation is available at:
+ http://latanadelgurzo.blogspot.com/2015/03/listen-youtube-music-on-your-android.html
 
 Download
 --------
@@ -32,5 +34,5 @@ QPython can download a script directly from a QR Code
 Usage Examples
 --------------
 
-Here is how to use the script on your device
-- https://www.youtube.com/watch?v=C06QHoWxUbo&feature=youtu.be
+Here is how to use the script on your device:
+ https://www.youtube.com/watch?v=C06QHoWxUbo&feature=youtu.be
