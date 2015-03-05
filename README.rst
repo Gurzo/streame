@@ -5,6 +5,9 @@ Listen YouTube music on your Android device with QPython and VLC
 
 Commented source will coming soon
 
+The purpose of this project is not to steal from the pockets of google or to compete with Spotify or Deezer.
+It's only a proof of concept of what you can do with a few lines of code and a bit of DIY philosophy
+
 Features
 --------
 
