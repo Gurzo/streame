@@ -8,6 +8,12 @@ Commented source will coming soon
 The purpose of this project is not to steal from the pockets of google or to compete with Spotify or Deezer.
 It's only a proof of concept of what you can do with a few lines of code and a bit of DIY philosophy
 
+Usage Examples
+--------------
+
+Here is how to use the script on your device:
+ https://www.youtube.com/watch?v=AKTst0m2bEY
+ 
 Features
 --------
 
@@ -44,8 +50,3 @@ QPython can download a script directly from a QR Code
 .. image:: https://raw.githubusercontent.com/Gurzo/streame/master/qr.jpg
     :target: https://rawgit.com/Gurzo/streame/master/streame.py
 
-Usage Examples
---------------
-
-Here is how to use the script on your device:
- https://www.youtube.com/watch?v=AKTst0m2bEY
