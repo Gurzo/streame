@@ -2,12 +2,12 @@
 #qpy:console
 #qpy:2
 """
-This is the beta version of streaMe
+This is the beta release of StreaMe
 
-version: 0.1.1
+version: 0.2.1
 
 @Author: Gurzo
-@Date: 2015-03-05
+@Date: 2015-03-16
 """
 
 import androidhelper
@@ -17,10 +17,44 @@ import re
 import urllib
 
 droid = None
+downloading = False
+
+def play(title, stream):
+	extrap = {'itemTitle':title}
+	try:
+		activity = droid.startActivityForResult('android.intent.action.VIEW', 
+		                    uri = stream, 
+							extras = extrap, 
+							type = 'application/mp4', 
+							packagename = 'org.videolan.vlc.betav7neon')
+		assert activity.error == None
+		return True
+	except Exception, e:
+		print e
+		return False
+
+def download(totalbytes, bytesdone, percent, rate, eta):
+	global downloading
+	if not downloading:
+		downloading = True
+		droid.dialogCreateHorizontalProgress(title='Downloading',message='Please wait',maximum_progress=100)
+		droid.dialogShow()
+	else:
+		droid.dialogSetCurrentProgress(int(round(percent,2)*100))
 	
-def play(url):
-	global droid
-	droid.dialogCreateSpinnerProgress(title='Retrieving video information',message='Please wait',maximum_progress=100)
+	if percent == 1.0:
+		downloading = False
+		droid.dialogDismiss()
+		#droid.notify('StreaMe','Download Complete!')
+		droid.makeToast('Download Complete!')
+
+def share(stream):
+	droid.setClipboard(stream)
+	droid.makeToast('Link copied to clipboard')
+	return True
+
+def open(url):
+	droid.dialogCreateSpinnerProgress(title='Retrieving info',message='Please wait',maximum_progress=100)
 	droid.dialogShow()
 	video = None 
 	try:
@@ -31,29 +65,24 @@ def play(url):
 	droid.dialogDismiss()
 	audiostreams = video.audiostreams
 	audioquality = [a.bitrate + ' - ' + '%.2f' % round((float(a.get_filesize()) / 1024 )/ 1024, 2) + 'MB' for a in audiostreams]
-	choice = choose('Select audio quality', audioquality, no = 'Cancel', yes = 'Best!')
-	stream = ''
-	if choice == 'positive':
-		stream = video.getbestaudio().url
-	elif choice == 'negative' or choice == 'c':
+	choice = choose('Select audio quality', audioquality, no = 'Cancel')
+	if choice == 'negative' or choice == 'c':
 		return False
 	else:
 		stream = audiostreams[choice].url 
-	title = str(video.title)
-	extrap = {'itemTitle':title}
-	try:
-		activity = droid.startActivityForResult('android.intent.action.VIEW', 
-		                    uri = stream, 
-							extras = extrap, 
-							type = 'application/mp4', 
-							packagename = 'org.videolan.vlc.betav7neon')
-		assert activity.error == None
-		return True
-	except:
-		return False
+		title = str(video.title)
+		action = choose('Select action', ['Stream','Download','Copy URL'], no = 'Cancel')
+		if action == 0:
+			return play(title, stream)
+		elif action == 1:
+			result = audiostreams[choice].download(filepath='/storage/emulated/0/Download/', quiet=True, callback=download)
+			return True
+		elif action == 2:
+			return share(url)
+		else:
+			return False
 
 def searchYT(word, page):
-	global droid
 	droid.dialogCreateSpinnerProgress(title='Searching',message='Please wait',maximum_progress=100)
 	droid.dialogShow()
 	param = { 'q' : word, 'sm' : '3', 'filters' : 'video', 'lclk' : 'video', 'page' : page}
@@ -69,7 +98,6 @@ def searchYT(word, page):
 	return (titles, urls)
 	
 def search(by = '', page = 1):	
-	global droid
 	word = ''
 	if page == 1:
 		line = droid.dialogGetInput(title='YouTube', message='Search for')
@@ -90,27 +118,25 @@ def search(by = '', page = 1):
 		elif choice == 'positive':
 			search(word, page+1)
 		elif choice < len(result[1]):
-			played = play(result[1][choice])
+			played = open(result[1][choice])
 		else:
 			break
 	return played
 
 def insert():
-	global droid
-	line = droid.dialogGetInput(title='YouTube Video to VLC Audio Stream', message='Insert URL')
+	line = droid.dialogGetInput(title='StreaMe', message='Insert URL')
 	if line.result == '':
 		droid.makeToast('You must insert a URL!')
 		return insert()
 	elif line.result != None:
 		url = line.result
-		played = play(url)
+		played = open(url)
 		if not played:
 			return insert()
 		return True
 	return False
 	
 def choose(title, flist, no = 0, yes = 0):
-	global droid
 	droid.dialogCreateAlert(title, '')
 	droid.dialogSetItems(flist)
 	if yes:
