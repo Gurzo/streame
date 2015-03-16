@@ -20,6 +20,7 @@ Features
 - Use VLC app to listen audio directly from YouTube video
 - Integrated lite search
 - Direct URL strem
+- Direct file downlaod 
 - Lightweight interface
 - No ads
 - No background service
