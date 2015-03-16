@@ -17,9 +17,9 @@ Here is how to use the script on your device:
 Features
 --------
 
-- Use VLC app to listen audio directly from YouTube video
+- Use VLC app to listen song directly from YouTube video
 - Integrated lite search
-- Direct URL strem
+- Direct URL stream
 - Direct file downlaod 
 - Lightweight interface
 - No ads
