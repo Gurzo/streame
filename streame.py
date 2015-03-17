@@ -4,20 +4,24 @@
 """
 This is the beta release of StreaMe
 
-version: 0.2.1
+version: 0.3.1
 
 @Author: Gurzo
-@Date: 2015-03-16
+@Date: 2015-03-18
 """
 
 import androidhelper
 import json
+import os
 import pafy
 import re
+import time
 import urllib
+import urllib2
 
 droid = None
 downloading = False
+dpath = ''
 
 def play(title, stream):
 	extrap = {'itemTitle':title}
@@ -37,7 +41,7 @@ def download(totalbytes, bytesdone, percent, rate, eta):
 	global downloading
 	if not downloading:
 		downloading = True
-		droid.dialogCreateHorizontalProgress(title='Downloading',message='Please wait',maximum_progress=100)
+		droid.dialogCreateHorizontalProgress(title='Downloading on',message=dpath,maximum_progress=100)
 		droid.dialogShow()
 	else:
 		droid.dialogSetCurrentProgress(int(round(percent,2)*100))
@@ -53,12 +57,17 @@ def share(stream):
 	droid.makeToast('Link copied to clipboard')
 	return True
 
+def retrivingStats(message):
+	#print message
+	#print time.time()
+	pass
+
 def open(url):
 	droid.dialogCreateSpinnerProgress(title='Retrieving info',message='Please wait',maximum_progress=100)
 	droid.dialogShow()
 	video = None 
 	try:
-		video = pafy.new(url)
+		video = pafy.new(url,callback=retrivingStats)
 	except:
 		droid.makeToast('Not valid YouTube URL')
 		return False
@@ -75,7 +84,7 @@ def open(url):
 		if action == 0:
 			return play(title, stream)
 		elif action == 1:
-			result = audiostreams[choice].download(filepath='/storage/emulated/0/Download/', quiet=True, callback=download)
+			result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=download)
 			return True
 		elif action == 2:
 			return share(url)
@@ -88,12 +97,34 @@ def searchYT(word, page):
 	param = { 'q' : word, 'sm' : '3', 'filters' : 'video', 'lclk' : 'video', 'page' : page}
 	query = urllib.urlencode(param)
 	url = 'https://www.youtube.com/results?' + query
-	htmlSource = urllib.urlopen(url).read()
+	
+	htmlSource = ''
+	try:
+		conn = urllib2.urlopen(url, timeout=5)
+		htmlSource = conn.read()
+	except urllib2.URLError, u:
+		droid.dialogDismiss()
+		print u.args
+		droid.makeToast('Network error!')
+		return 'error'
+	except Exception, e:
+		droid.dialogDismiss()
+		if e == '<urlopen error timed out>':
+			print 'Time out'
+			droid.makeToast('Connection timedout!')
+			return 'timeout'
+		return 'error'
+	
+	#droid.dialogDismiss()
+	#droid.dialogCreateSpinnerProgress(title='Analyzing',message='Please wait',maximum_progress=100)
+	#droid.dialogShow()
+	
 	search_results = re.findall(r'href=\"\/watch\?v=(.{11})', htmlSource)
 	urls = ['http://www.youtube.com/watch?v=' + id for id in search_results[0:][::2]]
 	titles = re.findall('title=\"([^"]{5,})\" rel="spf-prefetch" aria-describedby', htmlSource)
 	if len(titles) == 0:
 		titles = re.findall('title=\"([^"]{5,})\" aria-describedby', htmlSource)
+	
 	droid.dialogDismiss()
 	return (titles, urls)
 	
@@ -109,7 +140,13 @@ def search(by = '', page = 1):
 		word = line.result
 	else:
 		word = by
+	
 	result  = searchYT(word, page)
+	if result == 'timeout':
+		return False
+	elif result == 'error':
+		return False
+	
 	played = False
 	while True:
 		choice = choose('Search result on page ' + str(page), result[0], no='Cancel', yes='Next page')
@@ -121,6 +158,7 @@ def search(by = '', page = 1):
 			played = open(result[1][choice])
 		else:
 			break
+	
 	return played
 
 def insert():
@@ -155,17 +193,78 @@ def choose(title, flist, no = 0, yes = 0):
 		return 'c'
 	return resp.result
 
+def setDownloadPath():
+	global dpath
+	env = droid.environment()
+	if env.result.has_key('download'):
+		dpath = env.result['download'] + '/'
+	else:
+		folders = os.environ
+		if folders.has_key('EXTERNAL_STORAGE'):
+			dpath = folders['EXTERNAL_STORAGE'] + '/Download/'
+		elif folders.has_key('SECONDARY_STORAGE'):
+			dpath = folders['SECONDARY_STORAGE'] + '/'
+		elif folders.has_key('ANDROID_PUBLIC'):
+			dpath = folders['ANDROID_PUBLIC'] + '/'
+	return
+
 def createDroid():
-	try:
-		global droid
-		droid = androidhelper.Android()
-	except:
-		print 'Error encurred during init operation, please restart application.'
-		print 'If the problem persist, please restart your device'
-		exit(0)
+	for i in range(3):
+		try:
+			global droid
+			droid = androidhelper.Android()
+			return
+		except:
+			pass
+	print 'Error encurred during init operation \n Please restart application.'
+	print 'If the problem persist \n Try kill and reopen QPython interpreter'
+	print 'Finally, please restart your device'
+	quit()
+
+def welcome():
+	A = '##### ##### ####  ##### ##### #   # #####' 
+	B = '#       #   #   # #     #   # ## ## #    ' 
+	C = '#####   #   ####  ##### ##### # # # #####' 
+	D = '    #   #   # #   #     #   # #   # #    ' 
+	E = '#####   #   #  #  ##### #   # #   # #####' 
+
+	F = '/' + '+' * 39 + '\\' 
+	G = '#' + ' ' * 39 + '#' 
+	H = '#' + ' ' * 39 + '#' 
+	H1 = '#  This is the beta release of StreaMe  #'
+	H2 = '#   @Version: 0.3.1                     #' 
+	H3 = '#   @Author: Gurzo                      #' 
+	H4 = '#   @Date: 2015-03-18                   #' 
+	I = '#' + ' ' * 39 + '#' 
+	J = '\\' + '+'  * 39 + '/' 
+
+	print '' 
+	print A
+	print B
+	print C
+	print D
+	print E
+	print ''
+	print F
+	print G
+	print H1
+	print H2
+	print H3
+	print H4
+	print I
+	print J
+	print ''
+	print 'To resume last page, press back and Ok'
+	print ''
+
+def quit():
+	print 'Program terminated, please'
+	exit(0)
 
 def main():
+	welcome()
 	createDroid()
+	setDownloadPath()
 	while 1:
 		title = 'Welcome to StreaMe'
 		flist = ['Search on YouTube', 'Insert URL']
@@ -175,9 +274,9 @@ def main():
 		elif action == 0:
 			search()
 		elif action == 'negative':
-			exit(0)
+			quit()
 		elif action == 'c':
-			exit(0)
+			quit()
 
 if __name__ == '__main__':
 	main()
