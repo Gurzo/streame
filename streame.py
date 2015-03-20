@@ -4,7 +4,7 @@
 """
 This is the beta release of StreaMe
 
-version: 0.3.1
+version: 0.3.2
 
 @Author: Gurzo
 @Date: 2015-03-18
@@ -68,9 +68,26 @@ def open(url):
 	video = None 
 	try:
 		video = pafy.new(url,callback=retrivingStats)
-	except:
-		droid.makeToast('Not valid YouTube URL')
+	except ssl.SSLError, s:
+		droid.dialogDismiss()
+		print 'handshake error in retrirving info: ' + s.args
+		droid.makeToast('Network error!')
 		return False
+	except urllib2.URLError, u:
+		droid.dialogDismiss()
+		print 'url error in retrirving info: ' + u.args
+		droid.makeToast('Network error!')
+		return False
+	except IOError, i:
+		droid.dialogDismiss()
+		print 'video error in retrirving info: ' + i.args
+		droid.makeToast('Youtube says: This video is unavailable!')
+		return False
+	except Exception, e:
+		droid.dialogDismiss()
+		print 'some error in retrirving info: ' + e.args
+		return False
+
 	droid.dialogDismiss()
 	audiostreams = video.audiostreams
 	audioquality = [a.bitrate + ' - ' + '%.2f' % round((float(a.get_filesize()) / 1024 )/ 1024, 2) + 'MB' for a in audiostreams]
@@ -104,13 +121,13 @@ def searchYT(word, page):
 		htmlSource = conn.read()
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
-		print u.args
+		print 'network erro in searching: ' + u.args
 		droid.makeToast('Network error!')
 		return 'error'
 	except Exception, e:
 		droid.dialogDismiss()
 		if e == '<urlopen error timed out>':
-			print 'Time out'
+			print 'Time out error in searching:' + e.args
 			droid.makeToast('Connection timedout!')
 			return 'timeout'
 		return 'error'
@@ -222,40 +239,27 @@ def createDroid():
 	quit()
 
 def welcome():
-	A = '##### ##### ####  ##### ##### #   # #####' 
-	B = '#       #   #   # #     #   # ## ## #    ' 
-	C = '#####   #   ####  ##### ##### # # # #####' 
-	D = '    #   #   # #   #     #   # #   # #    ' 
-	E = '#####   #   #  #  ##### #   # #   # #####' 
-
-	F = '/' + '+' * 39 + '\\' 
-	G = '#' + ' ' * 39 + '#' 
-	H = '#' + ' ' * 39 + '#' 
-	H1 = '#  This is the beta release of StreaMe  #'
-	H2 = '#   @Version: 0.3.1                     #' 
-	H3 = '#   @Author: Gurzo                      #' 
-	H4 = '#   @Date: 2015-03-18                   #' 
-	I = '#' + ' ' * 39 + '#' 
-	J = '\\' + '+'  * 39 + '/' 
-
-	print '' 
-	print A
-	print B
-	print C
-	print D
-	print E
-	print ''
-	print F
-	print G
-	print H1
-	print H2
-	print H3
-	print H4
-	print I
-	print J
-	print ''
-	print 'To resume last page, press back and Ok'
-	print ''
+	message = []
+	message.append('')
+	message.append('##### ##### ####  ##### ##### #   # #####' )
+	message.append('#       #   #   # #     #   # ## ## #    ' )
+	message.append('#####   #   ####  ##### ##### # # # #####' )
+	message.append('    #   #   # #   #     #   # #   # #    ' )
+	message.append('#####   #   #  #  ##### #   # #   # #####' )
+	message.append('')
+	message.append('/' + '+' * 39 + '\\' )
+	message.append('#' + ' ' * 39 + '#' )
+	message.append('#  This is the beta release of StreaMe  #')
+	message.append('#   @Version: 0.3.1                     #' )
+	message.append('#   @Author: Gurzo                      #' )
+	message.append('#   @Date: 2015-03-18                   #' )
+	message.append('#' + ' ' * 39 + '#' )
+	message.append('\\' + '+'  * 39 + '/' )
+	message.append('')
+	message.append('To resume last page, press back and Ok')
+	message.append('')
+	for line in message:
+		print line
 
 def quit():
 	print 'Program terminated, please'
