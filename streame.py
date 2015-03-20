@@ -4,10 +4,10 @@
 """
 This is the beta release of StreaMe
 
-version: 0.3.2
+version: 0.3.3
 
 @Author: Gurzo
-@Date: 2015-03-18
+@Date: 2015-03-20
 """
 
 import androidhelper
@@ -70,22 +70,22 @@ def open(url):
 		video = pafy.new(url,callback=retrivingStats)
 	except ssl.SSLError, s:
 		droid.dialogDismiss()
-		print 'handshake error in retrirving info: ' + s.args
+		print 'handshake error in retrirving info: ' + str(s.args)
 		droid.makeToast('Network error!')
 		return False
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
-		print 'url error in retrirving info: ' + u.args
+		print 'url error in retrirving info: ' + str(u.args)
 		droid.makeToast('Network error!')
 		return False
 	except IOError, i:
 		droid.dialogDismiss()
-		print 'video error in retrirving info: ' + i.args
+		print 'video error in retrirving info: ' + str(i.args)
 		droid.makeToast('Youtube says: This video is unavailable!')
 		return False
 	except Exception, e:
 		droid.dialogDismiss()
-		print 'some error in retrirving info: ' + e.args
+		print 'some error in retrirving info: ' + str(e.args)
 		return False
 
 	droid.dialogDismiss()
@@ -121,13 +121,13 @@ def searchYT(word, page):
 		htmlSource = conn.read()
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
-		print 'network erro in searching: ' + u.args
+		print 'network erro in searching: ' + str(u.args)
 		droid.makeToast('Network error!')
 		return 'error'
 	except Exception, e:
 		droid.dialogDismiss()
 		if e == '<urlopen error timed out>':
-			print 'Time out error in searching:' + e.args
+			print 'Time out error in searching:' + str(e.args)
 			droid.makeToast('Connection timedout!')
 			return 'timeout'
 		return 'error'
@@ -250,7 +250,7 @@ def welcome():
 	message.append('/' + '+' * 39 + '\\' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('#  This is the beta release of StreaMe  #')
-	message.append('#   @Version: 0.3.1                     #' )
+	message.append('#   @Version: 0.3.3                     #' )
 	message.append('#   @Author: Gurzo                      #' )
 	message.append('#   @Date: 2015-03-18                   #' )
 	message.append('#' + ' ' * 39 + '#' )
