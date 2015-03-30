@@ -4,16 +4,20 @@
 """
 This is the beta release of StreaMe
 
-version: 0.3.3
+version: 0.3.4
 
 @Author: Gurzo
-@Date: 2015-03-20
+@Date: 2015-03-31
 """
 
+try:
+	import pafy
+except:
+	import site
+	import pafy
 import androidhelper
 import json
 import os
-import pafy
 import re
 import time
 import urllib
@@ -45,12 +49,11 @@ def download(totalbytes, bytesdone, percent, rate, eta):
 		droid.dialogShow()
 	else:
 		droid.dialogSetCurrentProgress(int(round(percent,2)*100))
-	
-	if percent == 1.0:
-		downloading = False
-		droid.dialogDismiss()
-		#droid.notify('StreaMe','Download Complete!')
-		droid.makeToast('Download Complete!')
+		if percent == 1.0:
+			downloading = False
+			droid.dialogDismiss()
+			#droid.notify('StreaMe','Download Complete!')
+			droid.makeToast('Download Complete!')
 
 def share(stream):
 	droid.setClipboard(stream)
@@ -89,24 +92,27 @@ def open(url):
 		return False
 
 	droid.dialogDismiss()
+	
 	audiostreams = video.audiostreams
 	audioquality = [a.bitrate + ' - ' + '%.2f' % round((float(a.get_filesize()) / 1024 )/ 1024, 2) + 'MB' for a in audiostreams]
-	choice = choose('Select audio quality', audioquality, no = 'Cancel')
-	if choice == 'negative' or choice == 'c':
-		return False
-	else:
-		stream = audiostreams[choice].url 
-		title = str(video.title)
-		action = choose('Select action', ['Stream','Download','Copy URL'], no = 'Cancel')
-		if action == 0:
-			return play(title, stream)
-		elif action == 1:
-			result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=download)
-			return True
-		elif action == 2:
-			return share(url)
-		else:
+	title = str(video.title)
+	action = choose('Select action', ['Stream','Download','Copy URL'], no = 'Cancel')
+	if action == 0:
+		choice = choose('Select audio quality', audioquality, no = 'Cancel')
+		if choice == 'negative' or choice == 'c':
 			return False
+		stream = audiostreams[choice].url
+		return play(title, stream)
+	elif action == 1:
+		choice = choose('Select audio quality', audioquality, no = 'Cancel')
+		if choice == 'negative' or choice == 'c':
+			return False
+		result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=download)
+		return True
+	elif action == 2:
+		return share(url)
+	else:
+		return False
 
 def searchYT(word, page):
 	droid.dialogCreateSpinnerProgress(title='Searching',message='Please wait',maximum_progress=100)
@@ -121,7 +127,7 @@ def searchYT(word, page):
 		htmlSource = conn.read()
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
-		print 'network erro in searching: ' + str(u.args)
+		print 'network error in searching: ' + str(u.args)
 		droid.makeToast('Network error!')
 		return 'error'
 	except Exception, e:
@@ -250,9 +256,9 @@ def welcome():
 	message.append('/' + '+' * 39 + '\\' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('#  This is the beta release of StreaMe  #')
-	message.append('#   @Version: 0.3.3                     #' )
+	message.append('#   @Version: 0.3.4                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: 2015-03-18                   #' )
+	message.append('#   @Date: 2015-03-31                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
