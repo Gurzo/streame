@@ -4,11 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.3.4
+version: 0.4.2
 
 @Author: Gurzo
 @Date: 2015-03-31
 """
+
+version = '0.4.2'
 
 try:
 	import pafy
@@ -18,6 +20,7 @@ except:
 import androidhelper
 import json
 import os
+import sys
 import re
 import time
 import urllib
@@ -26,6 +29,7 @@ import urllib2
 droid = None
 downloading = False
 dpath = ''
+
 
 def play(title, stream):
 	extrap = {'itemTitle':title}
@@ -216,6 +220,26 @@ def choose(title, flist, no = 0, yes = 0):
 		return 'c'
 	return resp.result
 
+def update():
+	droid.makeToast('Download update')
+	os.remove(sys.argv[0])
+	url = 'https://raw.githubusercontent.com/Gurzo/streame/master/streame.py'
+	conn = urllib2.urlopen(url)
+	html = response.read()
+	file = open('streame.py', 'w')
+	file.write(html)
+	file.close()
+	exit(0)
+
+def checkUpdate():
+	url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
+	conn = urllib2.urlopen(url)
+	file = conn.read()
+	if not version == str(file):
+		droid.makeToast('New version avaible')
+		return True
+	return False
+	
 def setDownloadPath():
 	global dpath
 	env = droid.environment()
@@ -256,7 +280,7 @@ def welcome():
 	message.append('/' + '+' * 39 + '\\' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('#  This is the beta release of StreaMe  #')
-	message.append('#   @Version: 0.3.4                     #' )
+	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
 	message.append('#   @Date: 2015-03-31                   #' )
 	message.append('#' + ' ' * 39 + '#' )
@@ -275,6 +299,8 @@ def main():
 	welcome()
 	createDroid()
 	setDownloadPath()
+	if checkUpdate():
+		update()
 	while 1:
 		title = 'Welcome to StreaMe'
 		flist = ['Search on YouTube', 'Insert URL']
