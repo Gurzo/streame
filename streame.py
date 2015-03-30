@@ -69,7 +69,7 @@ def retrivingStats(message):
 	#print time.time()
 	pass
 
-def open(url):
+def openURL(url):
 	droid.dialogCreateSpinnerProgress(title='Retrieving info',message='Please wait',maximum_progress=100)
 	droid.dialogShow()
 	video = None 
@@ -182,7 +182,7 @@ def search(by = '', page = 1):
 		elif choice == 'positive':
 			search(word, page+1)
 		elif choice < len(result[1]):
-			played = open(result[1][choice])
+			played = openURL(result[1][choice])
 		else:
 			break
 	
@@ -195,7 +195,7 @@ def insert():
 		return insert()
 	elif line.result != None:
 		url = line.result
-		played = open(url)
+		played = openURL(url)
 		if not played:
 			return insert()
 		return True
@@ -225,7 +225,7 @@ def update():
 	os.remove(sys.argv[0])
 	url = 'https://raw.githubusercontent.com/Gurzo/streame/master/streame.py'
 	conn = urllib2.urlopen(url)
-	html = response.read()
+	html = conn.read()
 	file = open('streame.py', 'w')
 	file.write(html)
 	file.close()
@@ -300,7 +300,8 @@ def main():
 	createDroid()
 	setDownloadPath()
 	if checkUpdate():
-		update()
+		#update()
+		pass
 	while 1:
 		title = 'Welcome to StreaMe'
 		flist = ['Search on YouTube', 'Insert URL']
