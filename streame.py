@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.4.3
+version: 0.4.4
 
 @Author: Gurzo
 @Date: 2015-03-31
 """
 
-version = '0.4.3'
+version = '0.4.4'
 
 try:
 	import pafy
@@ -221,8 +221,9 @@ def choose(title, flist = [], message = '', no = 0, yes = 0):
 		return 'c'
 	return resp.result
 
-def update():
-	action = choose('New version avaible', [], 'Do you want to update?', yes = 'Yes', no = 'Later')
+def update(ver):
+	print 'update'
+	action = choose('New version avaible - ' + ver, [], 'Do you want to update?', yes = 'Yes', no = 'Later')
 	if action == 'negative':
 		return
 	elif action == 'c':
@@ -246,17 +247,18 @@ def update():
 		exit(0)
 
 def checkUpdate():
+	ver = ''
 	try:
 		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
 		conn = urllib2.urlopen(url)
-		ver = conn.read()
-		if version == str(ver):
+		ver = str(conn.read())
+		if version == ver:
 			return
 	except:
 		print 'Error while checking for update'
 		return
 	droid.makeToast('New version avaible')
-	update()
+	update(ver)
 
 def setDownloadPath():
 	global dpath
