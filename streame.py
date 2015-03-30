@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.4.2
+version: 0.4.3
 
 @Author: Gurzo
 @Date: 2015-03-31
 """
 
-version = '0.4.2'
+version = '0.4.3'
 
 try:
 	import pafy
@@ -201,9 +201,10 @@ def insert():
 		return True
 	return False
 	
-def choose(title, flist, no = 0, yes = 0):
-	droid.dialogCreateAlert(title, '')
-	droid.dialogSetItems(flist)
+def choose(title, flist = [], message = '', no = 0, yes = 0):
+	droid.dialogCreateAlert(title, message)
+	if len(flist) > 0:
+		droid.dialogSetItems(flist)
 	if yes:
 		droid.dialogSetPositiveButtonText(yes)
 	if no:
@@ -221,25 +222,42 @@ def choose(title, flist, no = 0, yes = 0):
 	return resp.result
 
 def update():
-	droid.makeToast('Download update')
-	os.remove(sys.argv[0])
-	url = 'https://raw.githubusercontent.com/Gurzo/streame/master/streame.py'
-	conn = urllib2.urlopen(url)
-	html = conn.read()
-	file = open('streame.py', 'w')
-	file.write(html)
-	file.close()
-	exit(0)
+	action = choose('New version avaible', [], 'Do you want to update?', yes = 'Yes', no = 'Later')
+	if action == 'negative':
+		return
+	elif action == 'c':
+		return
+	elif action == 'positive':
+		droid.makeToast('Downloading update')
+		try:
+			url = 'https://raw.githubusercontent.com/Gurzo/streame/master/streame.py'
+			conn = urllib2.urlopen(url, timeout=5)
+			html = conn.read()
+			os.remove(sys.argv[0])
+			file = open(sys.argv[0], 'w')
+			file.write(html)
+			file.close()
+			print '\n Update completed \n Restart application'
+			droid.makeToast('Update complete')
+		except:
+			print 'Error during update'
+			droid.makeToast('Error during update, please try later')
+			return
+		exit(0)
 
 def checkUpdate():
-	url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
-	conn = urllib2.urlopen(url)
-	file = conn.read()
-	if not version == str(file):
-		droid.makeToast('New version avaible')
-		return True
-	return False
-	
+	try:
+		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
+		conn = urllib2.urlopen(url)
+		ver = conn.read()
+		if version == str(ver):
+			return
+	except:
+		print 'Error while checking for update'
+		return
+	droid.makeToast('New version avaible')
+	update()
+
 def setDownloadPath():
 	global dpath
 	env = droid.environment()
@@ -299,13 +317,12 @@ def main():
 	welcome()
 	createDroid()
 	setDownloadPath()
-	if checkUpdate():
-		#update()
-		pass
+	checkUpdate()
+	
 	while 1:
 		title = 'Welcome to StreaMe'
-		flist = ['Search on YouTube', 'Insert URL']
-		action = choose(title, flist, no = 'Exit')
+		option = ['Search on YouTube', 'Insert URL']
+		action = choose(title, option, no = 'Exit')
 		if action == 1:
 			insert()
 		elif action == 0:
