@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.4.4
+version: 0.4.5
 
 @Author: Gurzo
-@Date: 2015-03-31
+@Date: 2015-04-1
 """
 
-version = '0.4.4'
+version = '0.4.5'
 
 try:
 	import pafy
@@ -29,6 +29,8 @@ import urllib2
 droid = None
 downloading = False
 dpath = ''
+wifi = False
+timeout = 2
 
 
 def play(title, stream):
@@ -127,7 +129,7 @@ def searchYT(word, page):
 	
 	htmlSource = ''
 	try:
-		conn = urllib2.urlopen(url, timeout=5)
+		conn = urllib2.urlopen(url, timeout=timeout)
 		htmlSource = conn.read()
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
@@ -222,7 +224,7 @@ def choose(title, flist = [], message = '', no = 0, yes = 0):
 	return resp.result
 
 def update(ver):
-	print 'update'
+	print 'update avaible'
 	action = choose('New version avaible - ' + ver, [], 'Do you want to update?', yes = 'Yes', no = 'Later')
 	if action == 'negative':
 		return
@@ -247,18 +249,32 @@ def update(ver):
 		exit(0)
 
 def checkUpdate():
+	try:
+		wireless = droid.checkWifiState()
+		info = droid.wifiGetConnectionInfo()
+		if wireless.result and info.result['ip_address']:
+			wifi = True
+			droid.makeToast('WiFi')
+		else:
+			timeout = 5
+			droid.makeToast('Mobile')
+			return
+	except Exception, e:
+		print 'Error while checking wifi state'
+		#print e
+		return
 	ver = ''
 	try:
 		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
-		conn = urllib2.urlopen(url)
+		conn = urllib2.urlopen(url, timeout=1)
 		ver = str(conn.read())
 		if version == ver:
 			return
+		droid.makeToast('New version avaible')
+		update(ver)
 	except:
-		print 'Error while checking for update'
+		print 'Network error while checking for update'
 		return
-	droid.makeToast('New version avaible')
-	update(ver)
 
 def setDownloadPath():
 	global dpath
@@ -273,6 +289,9 @@ def setDownloadPath():
 			dpath = folders['SECONDARY_STORAGE'] + '/'
 		elif folders.has_key('ANDROID_PUBLIC'):
 			dpath = folders['ANDROID_PUBLIC'] + '/'
+		else:
+			print 'Errore while searching for a valid downlaod path'
+			exit(0)
 	return
 
 def createDroid():
@@ -285,7 +304,7 @@ def createDroid():
 			pass
 	print 'Error encurred during init operation \n Please restart application.'
 	print 'If the problem persist \n Try kill and reopen QPython interpreter'
-	print 'Finally, please restart your device'
+	print 'Finally \n Please restart your device'
 	quit()
 
 def welcome():
@@ -302,7 +321,7 @@ def welcome():
 	message.append('#  This is the beta release of StreaMe  #')
 	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: 2015-03-31                   #' )
+	message.append('#   @Date: 2015-04-1                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
@@ -321,9 +340,9 @@ def main():
 	setDownloadPath()
 	checkUpdate()
 	
-	while 1:
-		title = 'Welcome to StreaMe'
-		option = ['Search on YouTube', 'Insert URL']
+	title = 'Welcome to StreaMe'
+	option = ['Search on YouTube', 'Insert URL']
+	while 1:	
 		action = choose(title, option, no = 'Exit')
 		if action == 1:
 			insert()
