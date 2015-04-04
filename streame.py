@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.4.5
+version: 0.5.2
 
 @Author: Gurzo
-@Date: 2015-04-1
+@Date: 2015-04-5
 """
 
-version = '0.4.5'
+version = '0.5.2'
 
 try:
 	import pafy
@@ -25,9 +25,11 @@ import re
 import time
 import urllib
 import urllib2
+import ssl
 
 droid = None
 downloading = False
+cpath = ''
 dpath = ''
 wifi = False
 timeout = 2
@@ -47,7 +49,7 @@ def play(title, stream):
 		print e
 		return False
 
-def download(totalbytes, bytesdone, percent, rate, eta):
+def downloadProgress(totalbytes, bytesdone, percent, rate, eta):
 	global downloading
 	if not downloading:
 		downloading = True
@@ -70,6 +72,24 @@ def retrivingStats(message):
 	#print message
 	#print time.time()
 	pass
+
+def addQueue(title, url, quality):
+	file = open(cpath + '/download.txt', 'a')
+	file.write(title + '%%%' + url + '%%%' + str(quality))
+	file.close()
+	return
+
+def remQueue(title):
+	file = open(cpath + '/download.txt', 'r')
+	l = file.readlines()
+	file.close()
+	downloads = [p.split('%%%') for p in l]
+	after = [e for e in downloads if not e[0] == title]
+	fileo = open(cpath + '/download.txt', 'w')
+	for i in after:
+		fileo.write(i[0] + '%%%' + i[1] + '%%%' + str(i[2]))
+	fileo.close()
+	return
 
 def openURL(url):
 	droid.dialogCreateSpinnerProgress(title='Retrieving info',message='Please wait',maximum_progress=100)
@@ -102,18 +122,24 @@ def openURL(url):
 	audiostreams = video.audiostreams
 	audioquality = [a.bitrate + ' - ' + '%.2f' % round((float(a.get_filesize()) / 1024 )/ 1024, 2) + 'MB' for a in audiostreams]
 	title = str(video.title)
-	action = choose('Select action', ['Stream','Download','Copy URL'], no = 'Cancel')
+	action = choose('Select action', ['Stream','Download','Copy URL'], no = 'Back')
 	if action == 0:
-		choice = choose('Select audio quality', audioquality, no = 'Cancel')
+		choice = choose('Select audio quality', audioquality, no = 'Back')
 		if choice == 'negative' or choice == 'c':
 			return False
 		stream = audiostreams[choice].url
 		return play(title, stream)
 	elif action == 1:
-		choice = choose('Select audio quality', audioquality, no = 'Cancel')
+		choice = choose('Select audio quality', audioquality, no = 'Back')
 		if choice == 'negative' or choice == 'c':
 			return False
-		result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=download)
+		addQueue(title, url, choice)
+		try:
+			result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=downloadProgress)
+		except Exception, e:
+			print 'Error during downlaod' + str(e)
+			return False
+		remQueue(title)
 		return True
 	elif action == 2:
 		return share(url)
@@ -178,7 +204,7 @@ def search(by = '', page = 1):
 	
 	played = False
 	while True:
-		choice = choose('Search result on page ' + str(page), result[0], no='Cancel', yes='Next page')
+		choice = choose('Search result on page ' + str(page), result[0], no='Back', yes='Next page')
 		if choice == 'negative':
 			return search()
 		elif choice == 'positive':
@@ -223,8 +249,41 @@ def choose(title, flist = [], message = '', no = 0, yes = 0):
 		return 'c'
 	return resp.result
 
+def recDownload(url, quality):
+	video = pafy.new(url)
+	audiostreams = video.audiostreams
+	try:
+		result = audiostreams[quality].download(filepath=dpath, quiet=True, callback=download)
+	except Exception, e:
+		print 'Error during downlaod recovery' + str(e)
+		return False
+	return True
+
+def checkQueue():
+	file = open(cpath + '/download.txt', 'r')
+	l = file.readlines()
+	file.close()
+	if len(l) == 0:
+		droid.makeToast('Download queue is empty')
+		return
+	queue = [p.split('%%%') for p in l]
+	options = [e[0] for e in queue]
+	result = choose('Download Queue', options, no='Back')
+	if result == 'c':
+		return
+	elif result == 'negative':
+		return
+	recovered = recDownload(queue[result][1],int(queue[result][2]))
+	if recovered:
+		queue.pop(result)
+	fileo = open(cpath + '/download.txt', 'w')
+	for i in queue:
+		fileo.write(i[0] + '%%%' + i[1] + '%%%' + str(i[2]))
+	fileo.close()
+	return
+
 def update(ver):
-	print 'update avaible'
+	print 'Update avaible'
 	action = choose('New version avaible - ' + ver, [], 'Do you want to update?', yes = 'Yes', no = 'Later')
 	if action == 'negative':
 		return
@@ -266,7 +325,7 @@ def checkUpdate():
 	ver = ''
 	try:
 		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
-		conn = urllib2.urlopen(url, timeout=1)
+		conn = urllib2.urlopen(url, timeout=2)
 		ver = str(conn.read())
 		if version == ver:
 			return
@@ -292,6 +351,8 @@ def setDownloadPath():
 		else:
 			print 'Errore while searching for a valid downlaod path'
 			exit(0)
+	global cpath
+	cpath = sys.argv[0].split('streame.py')[0]
 	return
 
 def createDroid():
@@ -341,13 +402,15 @@ def main():
 	checkUpdate()
 	
 	title = 'Welcome to StreaMe'
-	option = ['Search on YouTube', 'Insert URL']
+	option = ['Search on YouTube', 'Insert URL', 'Download queue']
 	while 1:	
 		action = choose(title, option, no = 'Exit')
-		if action == 1:
-			insert()
-		elif action == 0:
+		if action == 0:
 			search()
+		elif action == 1:
+			insert()
+		elif action == 2:
+			checkQueue()
 		elif action == 'negative':
 			quit()
 		elif action == 'c':
