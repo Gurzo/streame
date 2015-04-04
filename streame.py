@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.2
+version: 0.5.3
 
 @Author: Gurzo
 @Date: 2015-04-5
 """
 
-version = '0.5.2'
+version = '0.5.3'
 
 try:
 	import pafy
@@ -301,13 +301,27 @@ def update(ver):
 			file.close()
 			print '\n Update completed \n Restart application'
 			droid.makeToast('Update complete')
-		except:
-			print 'Error during update'
+		except Exception, e:
+			print 'Error during update' + str (e)
 			droid.makeToast('Error during update, please try later')
 			return
 		exit(0)
 
 def checkUpdate():
+	ver = ''
+	try:
+		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
+		conn = urllib2.urlopen(url, timeout=2)
+		ver = str(conn.read())
+		if version == ver:
+			return
+		droid.makeToast('New version avaible')
+		update(ver)
+	except Exception, e:
+		print 'Network error while checking for update' + str(e)
+		return
+
+def checkNetwork():
 	try:
 		wireless = droid.checkWifiState()
 		info = droid.wifiGetConnectionInfo()
@@ -321,18 +335,6 @@ def checkUpdate():
 	except Exception, e:
 		print 'Error while checking wifi state'
 		#print e
-		return
-	ver = ''
-	try:
-		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
-		conn = urllib2.urlopen(url, timeout=2)
-		ver = str(conn.read())
-		if version == ver:
-			return
-		droid.makeToast('New version avaible')
-		update(ver)
-	except:
-		print 'Network error while checking for update'
 		return
 
 def setDownloadPath():
