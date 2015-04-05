@@ -317,7 +317,7 @@ def checkUpdate():
 		vers = int(vers[0])*100 + int(vers[1])*10 + int(vers[2])
 		verc = version.split('.')
 		verc= int(verc[0])*100 + int(verc[1])*10 + int(verc[2])
-		print str(verc) + ' VS ' + str(vers)
+		#print str(verc) + ' VS ' + str(vers)
 		if not vers > verc:
 			return
 		droid.makeToast('New version avaible')
