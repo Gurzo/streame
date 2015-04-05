@@ -21,6 +21,7 @@ Features
 - Integrated lite search
 - Direct URL stream
 - Direct file downlaod 
+- Download queue
 - Lightweight interface
 - No ads
 - No background service
