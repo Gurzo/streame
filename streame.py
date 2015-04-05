@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.3
+version: 0.5.5
 
 @Author: Gurzo
-@Date: 2015-04-5
+@Date: 2015-04-05
 """
 
-version = '0.5.3'
+version = '0.5.5'
 
 try:
 	import pafy
@@ -313,7 +313,12 @@ def checkUpdate():
 		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
 		conn = urllib2.urlopen(url, timeout=2)
 		ver = str(conn.read())
-		if version == ver:
+		vers = ver.split('.')
+		vers = int(vers[0])*100 + int(vers[1])*10 + int(vers[2])
+		verc = version.split('.')
+		verc= int(verc[0])*100 + int(verc[1])*10 + int(verc[2])
+		print str(verc) + ' VS ' + str(vers)
+		if not vers > verc:
 			return
 		droid.makeToast('New version avaible')
 		update(ver)
