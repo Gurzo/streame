@@ -11,6 +11,7 @@ version: 0.5.5
 """
 
 version = '0.5.5'
+relase = '2015-04-05'
 
 try:
 	import pafy
@@ -389,7 +390,7 @@ def welcome():
 	message.append('#  This is the beta release of StreaMe  #')
 	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: 2015-04-1                   #' )
+	message.append('#   @Date: ' + relase + '                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
