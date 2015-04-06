@@ -4,14 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.5
+version: 0.5.6
 
 @Author: Gurzo
-@Date: 2015-04-05
+@Date: 2015-04-07
 """
 
-version = '0.5.5'
-relase = '2015-04-05'
+version = '0.5.6'
 
 try:
 	import pafy
@@ -74,13 +73,23 @@ def retrivingStats(message):
 	#print time.time()
 	pass
 
+def checkQueue():
+	try:
+		file = open(cpath + '/download.txt', 'r')
+		file.close()
+	except:
+		file = open(cpath + '/download.txt', 'w')
+		file.close()
+
 def addQueue(title, url, quality):
+	checkQueue()
 	file = open(cpath + '/download.txt', 'a')
-	file.write(title + '%%%' + url + '%%%' + str(quality))
+	file.write(title + '%%%' + url + '%%%' + str(quality) + '\n')
 	file.close()
 	return
 
 def remQueue(title):
+	checkQueue()
 	file = open(cpath + '/download.txt', 'r')
 	l = file.readlines()
 	file.close()
@@ -254,13 +263,14 @@ def recDownload(url, quality):
 	video = pafy.new(url)
 	audiostreams = video.audiostreams
 	try:
-		result = audiostreams[quality].download(filepath=dpath, quiet=True, callback=download)
+		result = audiostreams[quality].download(filepath=dpath, quiet=True, callback=downloadProgress)
 	except Exception, e:
 		print 'Error during downlaod recovery' + str(e)
 		return False
 	return True
 
-def checkQueue():
+def openQueue():
+	checkQueue()
 	file = open(cpath + '/download.txt', 'r')
 	l = file.readlines()
 	file.close()
@@ -345,8 +355,14 @@ def checkNetwork():
 
 def setDownloadPath():
 	global dpath
-	env = droid.environment()
-	if env.result.has_key('download'):
+	env = {}
+	for i in range(0,3):
+		try:
+			e = droid.environment()
+			env = e.result
+		except:
+			print 'edsdp'
+	if e.has_key('download'):
 		dpath = env.result['download'] + '/'
 	else:
 		folders = os.environ
@@ -390,7 +406,7 @@ def welcome():
 	message.append('#  This is the beta release of StreaMe  #')
 	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: ' + relase + '                   #' )
+	message.append('#   @Date: 2015-04-07                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
@@ -418,7 +434,7 @@ def main():
 		elif action == 1:
 			insert()
 		elif action == 2:
-			checkQueue()
+			openQueue()
 		elif action == 'negative':
 			quit()
 		elif action == 'c':
