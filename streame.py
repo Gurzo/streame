@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.6
+version: 0.5.7
 
 @Author: Gurzo
 @Date: 2015-04-07
 """
 
-version = '0.5.6'
+version = '0.5.7'
 
 try:
 	import pafy
@@ -362,8 +362,8 @@ def setDownloadPath():
 			env = e.result
 		except:
 			print 'edsdp'
-	if e.has_key('download'):
-		dpath = env.result['download'] + '/'
+	if env.has_key('download'):
+		dpath = env['download'] + '/'
 	else:
 		folders = os.environ
 		if folders.has_key('EXTERNAL_STORAGE'):
