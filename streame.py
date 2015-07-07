@@ -4,19 +4,26 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.7
+version: 0.5.9
 
 @Author: Gurzo
-@Date: 2015-04-07
+@Date: 2015-07-07
 """
 
-version = '0.5.7'
+version = '0.5.9'
 
 try:
 	import pafy
 except:
 	import site
-	import pafy
+	try:
+		import pafy
+	except ImportError, ie:
+		print ie
+		print 'Let\'s install now!'
+		from setuptools.command import easy_install
+		easy_install.main( ["pafy"] )
+
 import androidhelper
 import json
 import os
@@ -238,6 +245,22 @@ def insert():
 			return insert()
 		return True
 	return False
+
+def scan():
+	line = droid.scanBarcode()
+	if line.result:
+		qr = str(line.result['extras']['SCAN_RESULT'])
+		if qr:
+			url = qr
+			played = openURL(url)
+			if not played:
+				return scan()
+		else:
+			droid.makeToast('Nothing!')
+			return scan()
+		return True
+	return True
+
 	
 def choose(title, flist = [], message = '', no = 0, yes = 0):
 	droid.dialogCreateAlert(title, message)
@@ -316,7 +339,7 @@ def update(ver):
 			print 'Error during update' + str (e)
 			droid.makeToast('Error during update, please try later')
 			return
-		exit(0)
+		quit()
 
 def checkUpdate():
 	ver = ''
@@ -426,7 +449,7 @@ def main():
 	checkUpdate()
 	
 	title = 'Welcome to StreaMe'
-	option = ['Search on YouTube', 'Insert URL', 'Download queue']
+	option = ['Search on YouTube', 'Insert URL', 'Get URL from QR', 'Download queue']
 	while 1:	
 		action = choose(title, option, no = 'Exit')
 		if action == 0:
@@ -434,6 +457,8 @@ def main():
 		elif action == 1:
 			insert()
 		elif action == 2:
+			scan()
+		elif action == 3:
 			openQueue()
 		elif action == 'negative':
 			quit()
