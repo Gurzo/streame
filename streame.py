@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.5.9
+version: 0.6.0
 
 @Author: Gurzo
 @Date: 2015-07-07
 """
 
-version = '0.5.9'
+version = '0.6.0'
 
 try:
 	import pafy
