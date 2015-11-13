@@ -344,7 +344,7 @@ def update(ver):
 def checkUpdate():
 	ver = ''
 	try:
-		url = 'https://raw.githubusercontent.com/Gurzo/streame/master/version.txt'
+		url = 'https://goo.gl/qacZfD'
 		conn = urllib2.urlopen(url, timeout=2)
 		ver = str(conn.read())
 		vers = ver.split('.')
