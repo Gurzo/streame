@@ -4,13 +4,13 @@
 """
 This is the beta release of StreaMe
 
-version: 0.6.0
+version: 0.6.1
 
 @Author: Gurzo
 @Date: 13-11-2015
 """
 
-version = '0.6.0'
+version = '0.6.1'
 
 try:
 	import pafy
@@ -345,7 +345,10 @@ def checkUpdate():
 	ver = ''
 	try:
 		url = 'https://goo.gl/qacZfD'
-		conn = urllib2.urlopen(url, timeout=2)
+		#conn = urllib2.urlopen(url, timeout=2)
+		req = urllib2.Request(url)
+		req.add_header('User-agent', 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0')
+		conn = urllib2.urlopen(req, timeout=2)
 		ver = str(conn.read())
 		vers = ver.split('.')
 		vers = int(vers[0])*100 + int(vers[1])*10 + int(vers[2])
