@@ -7,7 +7,7 @@ This is the beta release of StreaMe
 version: 0.6.0
 
 @Author: Gurzo
-@Date: 2015-07-07
+@Date: 13-11-2015
 """
 
 version = '0.6.0'
