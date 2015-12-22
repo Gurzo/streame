@@ -4,25 +4,28 @@
 """
 This is the beta release of StreaMe
 
-version: 0.6.1
+version: 0.6.2
 
 @Author: Gurzo
-@Date: 13-11-2015
+@Date: 22-12-2015
 """
 
-version = '0.6.1'
+version = '0.6.2'
 
 try:
 	import pafy
+	from lxml import html,etree
 except:
 	import site
 	try:
 		import pafy
+		from lxml import html,etree
 	except ImportError, ie:
 		print ie
 		print 'Let\'s install now!'
 		from setuptools.command import easy_install
 		easy_install.main( ["pafy"] )
+		easy_install.main( ["lxml"] )
 
 import androidhelper
 import json
