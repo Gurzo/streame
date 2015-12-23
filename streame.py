@@ -4,28 +4,28 @@
 """
 This is the beta release of StreaMe
 
-version: 0.6.2
+version: 0.6.3
 
 @Author: Gurzo
-@Date: 22-12-2015
+@Date: 23-12-2015
 """
 
-version = '0.6.2'
+version = '0.6.3'
 
 try:
 	import pafy
-	from lxml import html,etree
+	#from lxml import html,etree
 except:
 	import site
 	try:
 		import pafy
-		from lxml import html,etree
+		#from lxml import html,etree
 	except ImportError, ie:
 		print ie
 		print 'Let\'s install now!'
 		from setuptools.command import easy_install
 		easy_install.main( ["pafy"] )
-		easy_install.main( ["lxml"] )
+		#easy_install.main( ["lxml"] )
 
 import androidhelper
 import json
@@ -180,13 +180,15 @@ def searchYT(word, page):
 	except urllib2.URLError, u:
 		droid.dialogDismiss()
 		print 'network error in searching: ' + str(u.args)
-		droid.makeToast('Network error!')
+		droid.makeToast('Network error!\nText copied on clipboard')
+		droid.setClipboard(word)
 		return 'error'
 	except Exception, e:
 		droid.dialogDismiss()
 		if e == '<urlopen error timed out>':
 			print 'Time out error in searching:' + str(e.args)
-			droid.makeToast('Connection timedout!')
+			droid.makeToast('Connection timedout!\nText copied on clipboard')
+			droid.setClipboard(word)
 			return 'timeout'
 		return 'error'
 	
@@ -297,9 +299,9 @@ def recDownload(url, quality):
 
 def openQueue():
 	checkQueue()
-	file = open(cpath + '/download.txt', 'r')
-	l = file.readlines()
-	file.close()
+	fileq = open(cpath + '/download.txt', 'r')
+	l = fileq.readlines()
+	fileq.close()
 	if len(l) == 0:
 		droid.makeToast('Download queue is empty')
 		return
