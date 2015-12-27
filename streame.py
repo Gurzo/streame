@@ -4,17 +4,18 @@
 """
 This is the beta release of StreaMe
 
-version: 0.6.3
+version: 0.6.6
 
 @Author: Gurzo
-@Date: 23-12-2015
+@Date: 28-12-2015
 """
 
-version = '0.6.3'
+version = '0.6.6'
 
 try:
 	import pafy
-	#from lxml import html,etree
+	#
+	from lxml import html,etree
 except:
 	import site
 	try:
@@ -85,31 +86,32 @@ def retrivingStats(message):
 
 def checkQueue():
 	try:
-		file = open(cpath + '/download.txt', 'r')
-		file.close()
+		fileq = open(cpath + '/download.txt', 'r')
+		fileq.close()
 	except:
-		file = open(cpath + '/download.txt', 'w')
-		file.close()
+		fileq = open(cpath + '/download.txt', 'w')
+		fileq.close()
+	return 0
 
 def addQueue(title, url, quality):
 	checkQueue()
-	file = open(cpath + '/download.txt', 'a')
-	file.write(title + '%%%' + url + '%%%' + str(quality) + '\n')
-	file.close()
-	return
+	fileq = open(cpath + '/download.txt', 'a')
+	fileq.write(title + '%%%' + url + '%%%' + str(quality) + '\n')
+	fileq.close()
+	return 0
 
 def remQueue(title):
 	checkQueue()
-	file = open(cpath + '/download.txt', 'r')
-	l = file.readlines()
-	file.close()
+	fileq = open(cpath + '/download.txt', 'r')
+	l = fileq.readlines()
+	fileq.close()
 	downloads = [p.split('%%%') for p in l]
 	after = [e for e in downloads if not e[0] == title]
 	fileo = open(cpath + '/download.txt', 'w')
 	for i in after:
 		fileo.write(i[0] + '%%%' + i[1] + '%%%' + str(i[2]))
 	fileo.close()
-	return
+	return 0
 
 def openURL(url):
 	droid.dialogCreateSpinnerProgress(title='Retrieving info',message='Please wait',maximum_progress=100)
@@ -157,7 +159,7 @@ def openURL(url):
 		try:
 			result = audiostreams[choice].download(filepath=dpath, quiet=True, callback=downloadProgress)
 		except Exception, e:
-			print 'Error during downlaod' + str(e)
+			print 'Error during downlaod ' + str(e)
 			return False
 		remQueue(title)
 		return True
@@ -335,15 +337,15 @@ def update(ver):
 			conn = urllib2.urlopen(url, timeout=5)
 			html = conn.read()
 			os.remove(sys.argv[0])
-			file = open(sys.argv[0], 'w')
-			file.write(html)
-			file.close()
+			fileo = open(sys.argv[0], 'w')
+			fileo.write(html)
+			fileo.close()
 			print '\n Update completed \n Restart application'
 			droid.makeToast('Update complete')
 		except Exception, e:
 			print 'Error during update' + str (e)
 			droid.makeToast('Error during update, please try later')
-			return
+			return 1
 		quit()
 
 def checkUpdate():
@@ -361,12 +363,12 @@ def checkUpdate():
 		verc= int(verc[0])*100 + int(verc[1])*10 + int(verc[2])
 		#print str(verc) + ' VS ' + str(vers)
 		if not vers > verc:
-			return
+			return 0
 		droid.makeToast('New version avaible')
 		update(ver)
 	except Exception, e:
 		print 'Network error while checking for update' + str(e)
-		return
+		return 1
 
 def checkNetwork():
 	try:
@@ -437,11 +439,11 @@ def welcome():
 	message.append('#  This is the beta release of StreaMe  #')
 	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: 2015-04-07                   #' )
+	message.append('#   @Date: 28-12-2015                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
-	message.append('To resume last page, press back and Ok')
+	message.append('To resume last page, press Back and Ok')
 	message.append('')
 	for line in message:
 		print line
@@ -457,7 +459,7 @@ def main():
 	checkUpdate()
 	
 	title = 'Welcome to StreaMe'
-	option = ['Search on YouTube', 'Insert URL', 'Get URL from QR', 'Download queue']
+	option = ['Search on YouTube', 'Insert URL', 'Get URL from QR', 'Incomplete Downloads']
 	while 1:	
 		action = choose(title, option, no = 'Exit')
 		if action == 0:
