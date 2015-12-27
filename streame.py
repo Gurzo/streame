@@ -14,8 +14,7 @@ version = '0.6.6'
 
 try:
 	import pafy
-	#
-	from lxml import html,etree
+	#from lxml import html,etree
 except:
 	import site
 	try:
