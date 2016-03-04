@@ -4,13 +4,11 @@
 """
 This is the beta release of StreaMe
 
-version: 0.6.8
-
 @Author: Gurzo
-@Date: 28-12-2015
 """
 
-version = '0.6.8'
+version = '0.7.1'
+date = '05-03-2016'
 
 try:
 	import pafy
@@ -438,7 +436,7 @@ def welcome():
 	message.append('#  This is the beta release of StreaMe  #')
 	message.append('#   @Version: ' + version + '                     #' )
 	message.append('#   @Author: Gurzo                      #' )
-	message.append('#   @Date: 28-12-2015                   #' )
+	message.append('#   @Date: ' + date + '                   #' )
 	message.append('#' + ' ' * 39 + '#' )
 	message.append('\\' + '+'  * 39 + '/' )
 	message.append('')
@@ -459,8 +457,12 @@ def main():
 	
 	title = 'Welcome to StreaMe'
 	option = ['Search on YouTube', 'Insert URL', 'Get URL from QR', 'Incomplete Downloads']
-	while 1:	
+
+	if len(sys.argv) > 1:
+		action = 4
+	else:
 		action = choose(title, option, no = 'Exit')
+	while 1:	
 		if action == 0:
 			search()
 		elif action == 1:
@@ -469,10 +471,13 @@ def main():
 			scan()
 		elif action == 3:
 			openQueue()
+		elif action == 4:
+			openURL(sys.argv[1])
 		elif action == 'negative':
 			quit()
 		elif action == 'c':
 			quit()
+		action = choose(title, option, no = 'Exit')
 
 if __name__ == '__main__':
 	main()
