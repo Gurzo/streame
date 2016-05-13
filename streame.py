@@ -7,8 +7,17 @@ This is the beta release of StreaMe
 @Author: Gurzo
 """
 
-version = '0.7.1'
-date = '05-03-2016'
+version = '0.7.2'
+date = '13-05-2016'
+
+import imp
+try:
+    imp.find_module('youtube_dl')
+except ImportError, ie:
+	print ie
+	print 'Let\'s install now!'
+	from setuptools.command import easy_install
+	easy_install.main( ["youtube_dl"] )
 
 try:
 	import pafy
