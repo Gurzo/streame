@@ -21,18 +21,15 @@ except ImportError, ie:
 
 try:
 	import pafy
-	#from lxml import html,etree
 except:
 	import site
 	try:
 		import pafy
-		#from lxml import html,etree
 	except ImportError, ie:
 		print ie
 		print 'Let\'s install now!'
 		from setuptools.command import easy_install
 		easy_install.main( ["pafy"] )
-		#easy_install.main( ["lxml"] )
 
 import androidhelper
 import json
